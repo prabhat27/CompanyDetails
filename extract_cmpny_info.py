@@ -54,8 +54,6 @@ class WikiExtract:
                         data[key] = values[0].lower()
             except:
                 pass
-        if(' ' in data.get('website', ' ')):  # Invalid url
-            return None
 
         return data
 
@@ -67,6 +65,8 @@ class WikiExtract:
         file_list = self.get_files()
         print "Total file count is: " + str(len(file_list))
 
+        url_pattern = re.compile('''href=[\'"]?([^\'" >]+)''')
+
         for file_path in file_list:
             try:
                 print "Processing file " + file_path 
@@ -75,19 +75,33 @@ class WikiExtract:
                 soup = Soup(source,"html.parser")
                 div = soup.find("table", attrs = {"class":"infobox"})
                 div_text = div.text.encode('utf-8')
+
                 if(self.is_valid(div_text)):
+                    all_trs = div.find_all('tr')
+                    # print (all_trs)
+                    for each in all_trs:
+                        try:
+                            key = each.find('th')
+                            value = each.find_all('td')
+                            if('Website' in str(each) ):
+                                website = url_pattern.findall(str(each))[-1].replace('"','').replace('href=','')
+                        except:
+                            pass
                     data = self.parse_div(div_text)
-                    if(data):
-                        data['file_path'] = file_path
-                        self.DB.insert_details(data)
+                    data['file_path'] = file_path
+                    data['website'] = website
+                    # print (data)
+                    self.DB.insert_details(data)
+                # break
             except:
+                # traceback.print_exc()
                 pass
 
 
 if __name__ == '__main__':
 
-    PATH = '/home/prabhat/Downloads/een' # File path 
-    PATH = list(sys.argv)[1]
+    PATH = '/home/prabhat/Downloads/en' # File path 
+    # PATH = list(sys.argv)[1]
     # print PATH
     wiki = WikiExtract(PATH)
     wiki.parse_page()

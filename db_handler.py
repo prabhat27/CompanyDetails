@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import traceback
 
 class DB:
-    def __init__(self, db_port = 27017, db = 'test', db_host = 'localhost', db_collection = 'company_details'):
+    def __init__(self, db_port = 27017, db = 'test', db_host = 'localhost', db_collection = 'company_details3'):
         self.HOST = db_host
         self.COLLECTION = db_collection
         self.PORT = db_port
