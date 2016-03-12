@@ -54,6 +54,9 @@ class WikiExtract:
                         data[key] = values[0].lower()
             except:
                 pass
+        if(' ' in data.get('website', ' ')):  # Invalid url
+            return None
+
         return data
 
     def parse_page(self):
@@ -74,15 +77,16 @@ class WikiExtract:
                 div_text = div.text.encode('utf-8')
                 if(self.is_valid(div_text)):
                     data = self.parse_div(div_text)
-                    data['file_path'] = file_path
-                    self.DB.insert_details(data)
+                    if(data):
+                        data['file_path'] = file_path
+                        self.DB.insert_details(data)
             except:
                 pass
 
 
 if __name__ == '__main__':
 
-    # PATH = '/home/prabhat/Downloads/een' # File path 
+    PATH = '/home/prabhat/Downloads/een' # File path 
     PATH = list(sys.argv)[1]
     # print PATH
     wiki = WikiExtract(PATH)
